@@ -19,6 +19,7 @@ def parse_outline(outline_text):
     """
     paths = []
     stack = []
+    root_seen = False
 
     for raw in outline_text.splitlines():
         line = raw.rstrip('\n')
@@ -46,10 +47,13 @@ def parse_outline(outline_text):
                 continue
             name = m2.group(1).strip()
 
-        # Name may include trailing comment; take the path token only
-        name = name.split(' ')[0]
         is_dir = name.endswith('/')
         clean_name = name.rstrip('/')
+
+        # Force the first root entry to be a directory even if the outline omitted a trailing slash
+        if not root_seen and depth == 0:
+            root_seen = True
+            is_dir = True
 
         # Adjust stack to current depth
         while len(stack) > depth:
